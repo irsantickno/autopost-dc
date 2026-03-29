@@ -1,5 +1,5 @@
 {
   "rewrites": [
-    { "source": "/api/discord/(.*)", "destination": "/api/discord?path=$1" }
+    { "source": "/api/discord/:path*", "destination": "/api/discord?path=:path*" }
   ]
 }
