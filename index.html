@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoPost DC — IrPremTech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#060810;
+  --bg1:#0a0d16;
+  --bg2:#0f1320;
+  --bg3:#131826;
+  --bg4:#181e2e;
+  --border:#1e2640;
+  --border2:rgba(80,120,255,0.15);
+  --cyan:#00d4ff;
+  --cyan2:#00aacc;
+  --purple:#8b5cf6;
+  --purple2:#6d44d0;
+  --green:#00ff88;
+  --green2:#00cc6a;
+  --red:#ff3355;
+  --red2:#cc2244;
+  --amber:#ffaa00;
+  --text:#c8d4f0;
+  --text2:#7a8aaa;
+  --text3:#3a4a6a;
+  --glow-cyan:0 0 20px rgba(0,212,255,0.3);
+  --glow-purple:0 0 20px rgba(139,92,246,0.3);
+  --glow-green:0 0 20px rgba(0,255,136,0.3);
+  --glow-red:0 0 20px rgba(255,51,85,0.3);
+}
+
+body{
+  font-family:'Exo 2',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  display:flex;
+  height:100vh;
+  overflow:hidden;
+  position:relative;
+}
+
+/* scanline overlay */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:300px;
+  min-width:300px;
+  background:var(--bg1);
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  position:relative;
+  z-index:1;
+}
+
+.sidebar::after{
+  content:'';
+  position:absolute;
+  top:0;right:0;
+  width:1px;height:100%;
+  background:linear-gradient(180deg,transparent,var(--cyan),transparent);
+  opacity:0.3;
+}
+
+.sidebar-header{
+  padding:20px 18px 16px;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,var(--bg2),var(--bg1));
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.logo-icon{
+  width:38px;height:38px;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+  box-shadow:var(--glow-cyan);
+  position:relative;
+  overflow:hidden;
+}
+
+.logo-icon::after{
+  content:'';
+  position:absolute;
+  top:-50%;left:-50%;
+  width:200%;height:200%;
+  background:linear-gradient(45deg,transparent 30%,rgba(255,255,255,0.1) 50%,transparent 70%);
+  animation:shine 3s infinite;
+}
+
+@keyframes shine{
+  0%{transform:translateX(-100%) translateY(-100%)}
+  100%{transform:translateX(100%) translateY(100%)}
+}
+
+.logo-text{
+  font-family:'Rajdhani',sans-serif;
+  font-size:1.1rem;
+  font-weight:700;
+  letter-spacing:0.05em;
+  background:linear-gradient(90deg,var(--cyan),var(--purple));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.logo-sub{
+  font-size:0.65rem;
+  color:var(--text3);
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;
+}
+
+.sidebar-body{
+  flex:1;
+  overflow-y:auto;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.sidebar-body::-webkit-scrollbar{width:3px}
+.sidebar-body::-webkit-scrollbar-track{background:transparent}
+.sidebar-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+.section-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.62rem;
+  font-weight:600;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--cyan);
+  margin-bottom:8px;
+  display:flex;align-items:center;gap:6px;
+}
+
+.section-label::after{
+  content:'';
+  flex:1;
+  height:1px;
+  background:linear-gradient(90deg,var(--border2),transparent);
+}
+
+.field-label{
+  font-size:0.72rem;
+  font-weight:600;
+  color:var(--text2);
+  display:block;
+  margin-bottom:4px;
+  margin-top:10px;
+  letter-spacing:0.04em;
+}
+
+.field-label:first-of-type{margin-top:0}
+
+input,select,textarea{
+  width:100%;
+  padding:8px 10px;
+  background:var(--bg3);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:7px;
+  font-size:0.82rem;
+  font-family:'Exo 2',sans-serif;
+  transition:border-color 0.2s,box-shadow 0.2s;
+  outline:none;
+  resize:none;
+}
+
+input::placeholder,textarea::placeholder{color:var(--text3)}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 2px rgba(0,212,255,0.1);
+}
+
+select option{background:var(--bg3)}
+
+textarea{min-height:80px;line-height:1.5}
+
+.row2{display:flex;gap:8px}
+.row2>div{flex:1}
+
+.estimate-tag{
+  margin-top:6px;
+  padding:5px 10px;
+  background:rgba(255,170,0,0.08);
+  border:1px solid rgba(255,170,0,0.2);
+  border-radius:6px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.7rem;
+  color:var(--amber);
+  letter-spacing:0.02em;
+}
+
+.optional-tag{
+  font-size:0.6rem;
+  background:rgba(0,212,255,0.1);
+  color:var(--cyan2);
+  padding:1px 6px;
+  border-radius:10px;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+}
+
+/* Buttons */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 14px;
+  border:none;border-radius:7px;
+  font-size:0.82rem;font-weight:600;
+  font-family:'Exo 2',sans-serif;
+  cursor:pointer;
+  transition:all 0.2s;
+  width:100%;
+}
+
+.btn:hover{transform:translateY(-1px);filter:brightness(1.1)}
+.btn:active{transform:translateY(0)}
+
+.btn-cyan{
+  background:linear-gradient(135deg,var(--cyan2),var(--purple2));
+  color:#fff;
+  box-shadow:0 3px 12px rgba(0,212,255,0.2);
+}
+
+.btn-green{
+  background:linear-gradient(135deg,#009955,#00cc6a);
+  color:#fff;
+  box-shadow:0 3px 12px rgba(0,255,136,0.2);
+}
+
+.btn-sm{
+  padding:5px 10px;
+  font-size:0.75rem;
+  width:auto;
+  border-radius:6px;
+}
+
+.btn-outline{
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--text2);
+}
+.btn-outline:hover{border-color:var(--cyan);color:var(--cyan)}
+
+.btn-stop{
+  background:linear-gradient(135deg,#aa1122,#cc2244);
+  color:#fff;
+  box-shadow:0 3px 12px rgba(255,51,85,0.2);
+}
+
+.btn-start{
+  background:linear-gradient(135deg,#007744,#009955);
+  color:#fff;
+  box-shadow:0 3px 12px rgba(0,255,136,0.2);
+}
+
+.btn-danger-outline{
+  background:transparent;
+  border:1px solid rgba(255,51,85,0.3);
+  color:var(--red);
+  transition:all 0.2s;
+}
+.btn-danger-outline:hover{background:rgba(255,51,85,0.1)}
+
+/* Account chips */
+.account-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+
+.account-chip{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:0.78rem;
+  transition:border-color 0.2s;
+  cursor:default;
+}
+
+.account-chip:hover{border-color:var(--border2)}
+
+.acct-avatar{
+  width:26px;height:26px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;
+  flex-shrink:0;
+  font-family:'Rajdhani',sans-serif;
+}
+
+.acct-name{
+  flex:1;font-weight:600;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:var(--text);
+}
+
+.acct-badge{
+  font-size:0.62rem;font-weight:700;
+  padding:2px 7px;border-radius:10px;
+  white-space:nowrap;
+}
+
+.badge-active{
+  background:rgba(0,255,136,0.12);
+  color:var(--green2);
+  border:1px solid rgba(0,255,136,0.2);
+}
+
+.badge-idle{
+  color:var(--text3);
+  font-size:0.65rem;
+}
+
+.btn-icon{
+  background:none;border:none;
+  color:var(--text3);cursor:pointer;
+  padding:3px 5px;border-radius:5px;
+  font-size:13px;line-height:1;
+  transition:color 0.2s,background 0.2s;
+  flex-shrink:0;
+}
+
+.btn-icon:hover{color:var(--red);background:rgba(255,51,85,0.1)}
+
+.divider{border:none;border-top:1px solid var(--border);margin:2px 0}
+
+/* ── MAIN ── */
+.main{
+  flex:1;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  position:relative;
+  z-index:1;
+}
+
+.topbar{
+  padding:16px 22px;
+  border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+  background:var(--bg1);
+  position:relative;
+}
+
+.topbar::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  opacity:0.3;
+}
+
+.topbar-title{
+  font-family:'Rajdhani',sans-serif;
+  font-size:1.05rem;
+  font-weight:700;
+  letter-spacing:0.06em;
+  color:var(--text);
+  display:flex;align-items:center;gap:8px;
+}
+
+.topbar-title .dot{
+  width:8px;height:8px;
+  border-radius:50%;
+  background:var(--cyan);
+  box-shadow:0 0 8px var(--cyan);
+  animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:0.5;transform:scale(0.8)}
+}
+
+.topbar-right{display:flex;align-items:center;gap:10px}
+
+.task-counter{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;
+  color:var(--text2);
+  background:var(--bg3);
+  padding:4px 12px;
+  border-radius:20px;
+  border:1px solid var(--border);
+}
+
+.board-area{
+  flex:1;
+  padding:20px;
+  overflow-y:auto;
+}
+
+.board-area::-webkit-scrollbar{width:4px}
+.board-area::-webkit-scrollbar-track{background:transparent}
+.board-area::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+.kanban-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(285px,1fr));
+  gap:14px;
+}
+
+/* Task cards */
+.card{
+  background:var(--bg1);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px;
+  position:relative;
+  overflow:hidden;
+  transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s;
+  animation:cardIn 0.25s ease;
+}
+
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  border-color:var(--border2);
+}
+
+.card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+}
+
+.card.on::before{background:linear-gradient(90deg,var(--green),var(--cyan));box-shadow:0 0 10px rgba(0,255,136,0.5)}
+.card.off::before{background:linear-gradient(90deg,var(--red),var(--purple))}
+
+/* card glow on ON state */
+.card.on{box-shadow:0 0 0 1px rgba(0,255,136,0.08) inset}
+
+.card-top{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  margin-bottom:10px;
+}
+
+.status-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.62rem;font-weight:600;
+  letter-spacing:0.1em;
+  padding:3px 9px;border-radius:20px;
+}
+
+.pill-on{background:rgba(0,255,136,0.1);color:var(--green);border:1px solid rgba(0,255,136,0.2)}
+.pill-off{background:rgba(255,51,85,0.1);color:var(--red);border:1px solid rgba(255,51,85,0.2)}
+
+.status-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.pill-on .status-dot{animation:pulse 1.5s infinite}
+
+.card-channel{
+  font-family:'Rajdhani',sans-serif;
+  font-size:0.95rem;font-weight:700;
+  letter-spacing:0.03em;
+  color:var(--text);
+  margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+
+.channel-type{
+  font-size:0.7rem;
+  padding:1px 6px;
+  border-radius:5px;
+  background:rgba(0,212,255,0.1);
+  color:var(--cyan);
+  font-family:'JetBrains Mono',monospace;
+  font-weight:600;
+}
+
+.card-meta{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+
+.meta-row{
+  display:flex;align-items:center;gap:6px;
+  font-size:0.75rem;
+  color:var(--text2);
+  font-family:'JetBrains Mono',monospace;
+}
+
+.meta-icon{font-size:11px;width:14px;text-align:center;flex-shrink:0}
+
+.next-time{color:var(--cyan)}
+.next-time.off-state{color:var(--text3)}
+
+.jitter-badge{
+  font-size:0.6rem;font-weight:600;
+  padding:1px 6px;border-radius:8px;
+  background:rgba(139,92,246,0.12);
+  color:#a78bfa;
+  border:1px solid rgba(139,92,246,0.15);
+}
+
+.card-msg{
+  background:var(--bg2);
+  border-left:2px solid var(--border2);
+  border-radius:0 6px 6px 0;
+  padding:8px 10px;
+  font-size:0.78rem;
+  color:var(--text2);
+  margin-bottom:12px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-style:italic;
+}
+
+.card-actions{display:flex;gap:7px;align-items:center}
+
+/* Empty state */
+.empty-state{
+  grid-column:1/-1;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  min-height:300px;
+  gap:12px;
+  color:var(--text3);
+  text-align:center;
+}
+
+.empty-icon{
+  font-size:48px;
+  opacity:0.3;
+  filter:grayscale(1);
+}
+
+.empty-text{
+  font-size:0.85rem;
+  color:var(--text3);
+  max-width:220px;
+  line-height:1.5;
+}
+
+/* Toast */
+#toast-wrap{
+  position:fixed;
+  bottom:20px;right:20px;
+  display:flex;flex-direction:column;
+  gap:8px;z-index:9999;
+}
+
+.toast{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px 16px;
+  font-size:0.8rem;font-weight:500;
+  color:var(--text);
+  box-shadow:0 8px 24px rgba(0,0,0,0.5);
+  animation:toastIn 0.25s ease;
+  display:flex;align-items:center;gap:8px;
+  max-width:300px;
+}
+
+.toast.ok{border-left:3px solid var(--green)}
+.toast.err{border-left:3px solid var(--red)}
+.toast.info{border-left:3px solid var(--cyan)}
+
+@keyframes toastIn{
+  from{opacity:0;transform:translateX(20px)}
+  to{opacity:1;transform:translateX(0)}
+}
+
+/* Modal */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.7);
+  backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;
+  z-index:100;
+  animation:fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.modal{
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-radius:14px;
+  padding:24px;
+  width:90%;max-width:380px;
+  box-shadow:0 0 60px rgba(0,212,255,0.1),0 24px 48px rgba(0,0,0,0.5);
+  position:relative;
+  overflow:hidden;
+}
+
+.modal::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,var(--cyan),var(--purple),var(--cyan));
+  background-size:200%;
+  animation:gradientMove 3s linear infinite;
+}
+
+@keyframes gradientMove{
+  0%{background-position:0%}
+  100%{background-position:200%}
+}
+
+.modal-title{
+  font-family:'Rajdhani',sans-serif;
+  font-size:1.1rem;font-weight:700;
+  letter-spacing:0.04em;
+  margin-bottom:6px;
+}
+
+.modal-sub{
+  font-size:0.8rem;
+  color:var(--text2);
+  margin-bottom:20px;
+  line-height:1.5;
+}
+
+.modal-actions{
+  display:flex;gap:8px;
+  margin-top:16px;
+}
+
+/* Loading spinner */
+.spin{
+  width:14px;height:14px;
+  border:2px solid rgba(255,255,255,0.2);
+  border-top-color:#fff;
+  border-radius:50%;
+  animation:spin 0.7s linear infinite;
+  display:none;
+}
+.spin.show{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Mobile responsive */
+@media(max-width:640px){
+  .sidebar{
+    position:fixed;
+    left:0;top:0;bottom:0;
+    transform:translateX(-100%);
+    transition:transform 0.3s;
+    z-index:50;
+    width:290px;
+  }
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay{
+    display:none;
+    position:fixed;inset:0;
+    background:rgba(0,0,0,0.6);
+    z-index:49;
+  }
+  .sidebar.open~.sidebar-overlay{display:block}
+  .menu-btn{display:flex!important}
+  .main{width:100%}
+}
+
+.menu-btn{
+  display:none;
+  background:none;border:none;
+  color:var(--text);cursor:pointer;
+  font-size:18px;padding:4px;
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-icon">⚡</div>
+      <div>
+        <div class="logo-text">AutoPost DC</div>
+        <div class="logo-sub">IrPremTech v1.0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-body">
+
+    <!-- ACCOUNTS -->
+    <div>
+      <div class="section-label">🔑 Accounts</div>
+      <label class="field-label" for="tokenInp">User Token</label>
+      <input id="tokenInp" type="password" placeholder="Paste Discord token…">
+      <div style="margin-top:8px">
+        <button class="btn btn-cyan" onclick="addAccount()">
+          <div class="spin" id="loginSpin"></div>
+          <span id="loginTxt">+ Add Account</span>
+        </button>
+      </div>
+      <div class="account-list" id="accountList">
+        <p style="font-size:0.75rem;color:var(--text3);margin-top:4px">Belum ada akun.</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- NEW TASK -->
+    <div>
+      <div class="section-label">📝 New Task</div>
+
+      <label class="field-label" for="accSelect">Account</label>
+      <select id="accSelect" onchange="loadChannels()">
+        <option value="" disabled selected>— pilih akun —</option>
+      </select>
+
+      <label class="field-label" for="chanSelect">Channel</label>
+      <select id="chanSelect" id="chanSelect">
+        <option value="" disabled selected>— pilih channel —</option>
+      </select>
+
+      <div class="row2">
+        <div>
+          <label class="field-label" for="intervalInp">Interval (menit)</label>
+          <input id="intervalInp" type="number" min="1" value="10" oninput="updateEstimate()">
+        </div>
+        <div>
+          <label class="field-label" for="jitterInp">Jitter (%)</label>
+          <input id="jitterInp" type="number" min="0" max="90" value="30" oninput="updateEstimate()">
+        </div>
+      </div>
+      <div class="estimate-tag" id="estimateTag">⌛ Estimasi: 7.0 – 13.0 menit</div>
+
+      <label class="field-label" for="msgInp">Message</label>
+      <textarea id="msgInp" placeholder="Tulis pesan yang akan dikirim…"></textarea>
+
+      <label class="field-label">
+        Webhook URL <span class="optional-tag">opsional</span>
+      </label>
+      <input id="webhookInp" type="url" placeholder="https://discord.com/api/webhooks/…">
+
+      <div style="margin-top:12px">
+        <button class="btn btn-green" onclick="createTask()">+ Add to Kanban</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- Main area -->
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-title">
+        <div class="dot"></div>
+        Automation Kanban
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="task-counter" id="taskCounter">0 tasks</span>
+    </div>
+  </div>
+
+  <div class="board-area">
+    <div class="kanban-grid" id="kanban"></div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-wrap"></div>
+
+<!-- Confirm modal -->
+<div class="modal-overlay" id="confirmModal" style="display:none">
+  <div class="modal">
+    <div class="modal-title" id="confirmTitle">Konfirmasi</div>
+    <div class="modal-sub" id="confirmMsg">Yakin?</div>
+    <div class="modal-actions">
+      <button class="btn btn-danger-outline btn-sm" id="confirmOk" style="flex:1">Ya, hapus</button>
+      <button class="btn btn-outline btn-sm" onclick="closeConfirm()" style="flex:1">Batal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+const PROXY = '/api/discord';
+
+let accounts = JSON.parse(localStorage.getItem('dc_accounts') || '[]');
+let tasks    = JSON.parse(localStorage.getItem('dc_tasks')    || '[]');
+let timers   = {}; // taskId -> timeoutId
+
+// ── UTILS ──
+function save() {
+  localStorage.setItem('dc_accounts', JSON.stringify(accounts));
+  localStorage.setItem('dc_tasks',    JSON.stringify(tasks));
+}
+
+function toast(msg, type='ok') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icons = {ok:'✅', err:'❌', info:'💠'};
+  t.innerHTML = `<span>${icons[type]||'💠'}</span><span>${msg}</span>`;
+  document.getElementById('toast-wrap').appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function formatTime(ms) {
+  if (!ms) return '—';
+  const d = new Date(ms);
+  return d.toTimeString().slice(0,8);
+}
+
+function updateEstimate() {
+  const iv = parseFloat(document.getElementById('intervalInp').value)||10;
+  const jt = parseFloat(document.getElementById('jitterInp').value)||30;
+  const lo = (iv*(1-jt/100)).toFixed(1);
+  const hi = (iv*(1+jt/100)).toFixed(1);
+  document.getElementById('estimateTag').textContent = `⌛ Estimasi: ${lo} – ${hi} menit`;
+}
+
+// ── DISCORD API HELPERS ──
+async function discordGet(path, token) {
+  const r = await fetch(`${PROXY}/${path}`, {
+    headers: { 'X-Discord-Token': token }
+  });
+  if (!r.ok) throw new Error(`Discord API ${r.status}`);
+  return r.json();
+}
+
+async function discordPost(channelId, token, content) {
+  const r = await fetch(`${PROXY}/channels/${channelId}/messages`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Discord-Token': token
+    },
+    body: JSON.stringify({ content })
+  });
+  return r.ok;
+}
+
+async function webhookPost(webhookUrl, content) {
+  const r = await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content })
+  });
+  return r.ok;
+}
+
+// ── ACCOUNTS ──
+async function addAccount() {
+  const token = document.getElementById('tokenInp').value.trim();
+  if (!token) return toast('Token tidak boleh kosong', 'err');
+
+  const spin = document.getElementById('loginSpin');
+  const txt  = document.getElementById('loginTxt');
+  spin.classList.add('show');
+  txt.textContent = 'Connecting…';
+
+  try {
+    const me = await discordGet('users/@me', token);
+    if (!me.id) throw new Error('invalid');
+
+    const tag = me.username + (me.discriminator && me.discriminator !== '0' ? '#'+me.discriminator : '');
+    if (accounts.find(a => a.token === token)) {
+      toast('Akun sudah ditambahkan', 'info');
+    } else {
+      accounts.push({ token, tag, id: me.id });
+      save();
+      toast(`Login: ${tag}`, 'ok');
+    }
+    document.getElementById('tokenInp').value = '';
+    renderAccounts();
+  } catch(e) {
+    toast('Token tidak valid atau proxy error', 'err');
+  } finally {
+    spin.classList.remove('show');
+    txt.textContent = '+ Add Account';
+  }
+}
+
+function renderAccounts() {
+  const list = document.getElementById('accountList');
+  const sel  = document.getElementById('accSelect');
+
+  if (!accounts.length) {
+    list.innerHTML = '<p style="font-size:0.75rem;color:var(--text3);margin-top:4px">Belum ada akun.</p>';
+    sel.innerHTML  = '<option value="" disabled selected>— pilih akun —</option>';
+    return;
+  }
+
+  const activeCounts = {};
+  tasks.filter(t=>t.status==='on').forEach(t=>{
+    activeCounts[t.token] = (activeCounts[t.token]||0)+1;
+  });
+
+  list.innerHTML = accounts.map(a => `
+    <div class="account-chip">
+      <div class="acct-avatar">${a.tag[0].toUpperCase()}</div>
+      <span class="acct-name" title="${a.tag}">${a.tag}</span>
+      ${activeCounts[a.token]
+        ? `<span class="acct-badge badge-active">${activeCounts[a.token]} aktif</span>`
+        : `<span class="acct-badge badge-idle">idle</span>`}
+      <button class="btn-icon" onclick="removeAccount('${a.token}')" title="Hapus">🗑</button>
+    </div>
+  `).join('');
+
+  sel.innerHTML = '<option value="" disabled>— pilih akun —</option>' +
+    accounts.map(a => `<option value="${a.token}">${a.tag}</option>`).join('');
+}
+
+function removeAccount(token) {
+  confirm2('Hapus akun ini?', 'Semua task yang terkait juga akan dihapus.', () => {
+    // stop & remove tasks
+    tasks.filter(t=>t.token===token).forEach(t=>stopTimer(t.id));
+    tasks    = tasks.filter(t=>t.token!==token);
+    accounts = accounts.filter(a=>a.token!==token);
+    save();
+    renderAccounts();
+    renderKanban();
+    toast('Akun dihapus', 'err');
+  });
+}
+
+// ── CHANNELS ──
+async function loadChannels() {
+  const token = document.getElementById('accSelect').value;
+  if (!token) return;
+
+  const sel = document.getElementById('chanSelect');
+  sel.innerHTML = '<option disabled selected>⏳ Loading guilds…</option>';
+
+  try {
+    const guilds = await discordGet('users/@me/guilds', token);
+    const channels = [];
+
+    for (const g of guilds.slice(0, 20)) { // limit to 20 guilds
+      try {
+        const gChannels = await discordGet(`guilds/${g.id}/channels`, token);
+        const textCh = gChannels.filter(c=>c.type===0);
+        textCh.forEach(c=>channels.push({
+          id: c.id,
+          name: c.name,
+          guild: g.name
+        }));
+      } catch {}
+    }
+
+    if (!channels.length) throw new Error('no channels');
+    sel.innerHTML = channels.map(c =>
+      `<option value="${c.id}" data-guild="${c.guild}">[${c.guild}] #${c.name}</option>`
+    ).join('');
+    toast(`${channels.length} channel loaded`, 'info');
+  } catch(e) {
+    // fallback: manual input
+    sel.innerHTML = '<option value="__manual__">— masukkan Channel ID manual —</option>';
+    toast('Gagal load channels. Pakai Channel ID manual.', 'info');
+  }
+}
+
+// ── TASKS ──
+function createTask() {
+  const chanSel  = document.getElementById('chanSelect');
+  const token    = document.getElementById('accSelect').value;
+  const msg      = document.getElementById('msgInp').value.trim();
+  const interval = parseInt(document.getElementById('intervalInp').value)||10;
+  const jitter   = parseInt(document.getElementById('jitterInp').value)||30;
+  const webhook  = document.getElementById('webhookInp').value.trim();
+
+  if (!token)  return toast('Pilih akun dulu', 'err');
+  if (!msg)    return toast('Pesan tidak boleh kosong', 'err');
+
+  let channelId   = chanSel.value;
+  let channelName = chanSel.options[chanSel.selectedIndex]?.text || channelId;
+
+  if (channelId === '__manual__') {
+    channelId = prompt('Masukkan Channel ID:')?.trim();
+    if (!channelId) return;
+    channelName = '#' + channelId;
+  }
+
+  if (!channelId && !webhook) return toast('Pilih channel atau isi Webhook URL', 'err');
+
+  const acct = accounts.find(a=>a.token===token);
+  const task = {
+    id:          Date.now().toString(),
+    token,
+    accountTag:  acct?.tag || '?',
+    channelId,
+    channelName,
+    webhookUrl:  webhook,
+    message:     msg,
+    interval,
+    jitter,
+    status:      'off',
+    lastRun:     null,
+    nextRun:     null,
+  };
+
+  tasks.push(task);
+  save();
+  startTimer(task.id);
+  renderKanban();
+  renderAccounts();
+
+  document.getElementById('msgInp').value    = '';
+  document.getElementById('webhookInp').value = '';
+  toast('Task ditambahkan & dijalankan!', 'ok');
+}
+
+// ── TIMER LOGIC ──
+function getDelay(task) {
+  const base = task.interval * 60 * 1000;
+  const j    = base * (task.jitter / 100);
+  return base - j + Math.random() * j * 2;
+}
+
+function startTimer(taskId) {
+  const task = tasks.find(t=>t.id===taskId);
+  if (!task) return;
+  task.status = 'on';
+
+  const fire = async () => {
+    const t = tasks.find(x=>x.id===taskId);
+    if (!t || t.status !== 'on') return;
+
+    // POST
+    let ok = false;
+    try {
+      if (t.webhookUrl) {
+        ok = await webhookPost(t.webhookUrl, t.message);
+      } else if (t.channelId) {
+        ok = await discordPost(t.channelId, t.token, t.message);
+      }
+    } catch {}
+
+    t.lastRun = Date.now();
+    const delay = getDelay(t);
+    t.nextRun = Date.now() + delay;
+    save();
+    renderKanban();
+
+    if (!ok) toast(`⚠ Post gagal: ${t.channelName}`, 'err');
+
+    timers[taskId] = setTimeout(fire, delay);
+  };
+
+  const delay = getDelay(task);
+  task.nextRun = Date.now() + delay;
+  task.status  = 'on';
+  save();
+  timers[taskId] = setTimeout(fire, delay);
+  renderKanban();
+}
+
+function stopTimer(taskId) {
+  clearTimeout(timers[taskId]);
+  delete timers[taskId];
+  const task = tasks.find(t=>t.id===taskId);
+  if (task) {
+    task.status  = 'off';
+    task.nextRun = null;
+    save();
+  }
+}
+
+function toggleTask(taskId) {
+  const task = tasks.find(t=>t.id===taskId);
+  if (!task) return;
+  if (task.status === 'on') {
+    stopTimer(taskId);
+    toast('Task dihentikan ⏹', 'info');
+  } else {
+    startTimer(taskId);
+    toast('Task dijalankan ▶', 'ok');
+  }
+  renderKanban();
+  renderAccounts();
+}
+
+function deleteTask(taskId) {
+  confirm2('Hapus task ini?', '', () => {
+    stopTimer(taskId);
+    tasks = tasks.filter(t=>t.id!==taskId);
+    save();
+    renderKanban();
+    renderAccounts();
+    toast('Task dihapus', 'err');
+  });
+}
+
+// ── KANBAN RENDER ──
+function renderKanban() {
+  const board = document.getElementById('kanban');
+  document.getElementById('taskCounter').textContent =
+    `${tasks.length} task${tasks.length!==1?'s':''}`;
+
+  if (!tasks.length) {
+    board.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <p class="empty-text">Belum ada task.<br>Tambahkan dari sidebar kiri.</p>
+      </div>`;
+    return;
+  }
+
+  board.innerHTML = tasks.map(task => {
+    const isOn = task.status === 'on';
+    const isWebhook = !!task.webhookUrl;
+    return `
+    <div class="card ${task.status}" id="card-${task.id}">
+      <div class="card-top">
+        <div class="status-pill ${isOn?'pill-on':'pill-off'}">
+          <span class="status-dot"></span>
+          ${isOn?'ON':'OFF'}
+        </div>
+        <span style="font-size:18px">💬</span>
+      </div>
+
+      <div class="card-channel">
+        ${task.channelName}
+        ${isWebhook ? '<span class="channel-type">WH</span>' : ''}
+      </div>
+
+      <div class="card-meta">
+        <div class="meta-row">
+          <span class="meta-icon">⏱</span>
+          ~${task.interval}m
+          <span class="jitter-badge">±${task.jitter}% jitter</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-icon">🕐</span>
+          Last: ${task.lastRun ? formatTime(task.lastRun) : '—'}
+        </div>
+        <div class="meta-row">
+          <span class="meta-icon">⏭</span>
+          Next: <span class="${isOn?'next-time':'next-time off-state'}">
+            ${task.nextRun && isOn ? formatTime(task.nextRun) : '—'}
+          </span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-icon">👤</span>
+          ${task.accountTag}
+        </div>
+      </div>
+
+      <div class="card-msg" title="${task.message}">"${task.message}"</div>
+
+      <div class="card-actions">
+        <button class="btn btn-sm ${isOn?'btn-stop':'btn-start'}"
+          onclick="toggleTask('${task.id}')">
+          ${isOn?'⏹ Stop':'▶ Start'}
+        </button>
+        <button class="btn btn-sm btn-danger-outline"
+          onclick="deleteTask('${task.id}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── CONFIRM MODAL ──
+let _confirmCb = null;
+
+function confirm2(title, msg, cb) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').textContent   = msg;
+  _confirmCb = cb;
+  document.getElementById('confirmModal').style.display = 'flex';
+}
+
+document.getElementById('confirmOk').onclick = () => {
+  closeConfirm();
+  if (_confirmCb) _confirmCb();
+};
+
+function closeConfirm() {
+  document.getElementById('confirmModal').style.display = 'none';
+}
+
+// ── SIDEBAR TOGGLE (mobile) ──
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+// ── LIVE CLOCK UPDATE for next-run times ──
+setInterval(() => {
+  // Update next-run times every 5s without full re-render
+  tasks.forEach(task => {
+    if (task.status === 'on' && task.nextRun) {
+      const el = document.querySelector(`#card-${task.id} .next-time`);
+      if (el) el.textContent = formatTime(task.nextRun);
+    }
+  });
+}, 5000);
+
+// ── INIT ──
+renderAccounts();
+renderKanban();
+updateEstimate();
+</script>
+</body>
+</html>
