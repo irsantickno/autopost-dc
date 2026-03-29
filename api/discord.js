@@ -5,14 +5,15 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const { path } = req.query;
-  if (!path) return res.status(400).json({ error: 'Missing path' });
+  const rawPath = req.query.path;
+  if (!rawPath) return res.status(400).json({ error: 'Missing path' });
+  const path = Array.isArray(rawPath) ? rawPath.join('/') : rawPath;
 
   const token = req.headers['x-discord-token'];
   if (!token) return res.status(400).json({ error: 'Missing token' });
 
   try {
-    const discordRes = await fetch(`https://discord.com/api/v9/${Array.isArray(path) ? path.join('/') : path}`, {
+    const discordRes = await fetch(`https://discord.com/api/v9/${path}`, {
       method: req.method,
       headers: {
         'Authorization': token,
